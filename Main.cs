@@ -8,16 +8,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using EasyPythonIde.Properties;
 
 namespace EasyPythonIde
 {
     public partial class Main : Form
     {
         public bool CurrentFileChanged = true;
-        public string CurrentFileName = "未命名.py";
-        public string CurrentFilePath = "未命名.py";
+        public string CurrentFileName = Resources.DefaultFileName;
+        public string CurrentFilePath = Resources.DefaultFileName;
+        public string programPath = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
         public string PythonPath = "";
         public int TabSpaceCount = 2;
+        public Font EditorFont = new Font("Consolas", 12f);
 
         public Main()
         {
@@ -29,41 +32,49 @@ namespace EasyPythonIde
             string tmpPyPath = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "\\python\\python.exe";
             if (File.Exists(tmpPyPath))
             {
-                MessageBox.Show("已成功检测到目录下同捆Python解释器");
+                MessageBox.Show(Resources.BundlePython_Found,
+                    Resources.BundlePython_MessageCaption, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 PythonPath = tmpPyPath;
             }
             else
             {
-                MessageBox.Show("未检测到同捆Python解释器，将会尝试使用系统自带版本");
+                MessageBox.Show(Resources.BundlePyhton_NotFound,
+                    Resources.BundlePython_MessageCaption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 PythonPath = "python.exe";
             }
+
+            richCodeBox.Font = EditorFont;
         }
 
         private void updateCaption()
         {
-            this.Text = CurrentFileName + (CurrentFileChanged ? "(已修改) - " : " - ") + "EasyPython";
+            this.Text = CurrentFileName +
+                        (CurrentFileChanged ? Resources.CaptionJoin_Edited : Resources.CaptionJoin_Unedited) +
+                        Resources.ProgramName;
         }
         
+        StringBuilder _stat_labelBuilder = new StringBuilder();
+        int _stat_line, _stat_column, _stat_totalLine;
         private void updateStat()
         {
-            int line,column;
-            cursorPosition(out line,out column);
-            labelCount.Text=$"第{line}行，第{column}列";
+            cursorPosition(out _stat_line, out _stat_column, out _stat_totalLine);
+            _stat_labelBuilder.Append(Resources.StatisticLabel_pt1);
+            _stat_labelBuilder.Append(_stat_line);
+            _stat_labelBuilder.Append(Resources.StatisticLabel_pt2);
+            _stat_labelBuilder.Append(_stat_column);
+            _stat_labelBuilder.Append(Resources.StatisticLabel_pt3);
+            _stat_labelBuilder.Append(_stat_totalLine);
+            _stat_labelBuilder.Append(Resources.StatisticLabel_pt4);
+            labelCount.Text = _stat_labelBuilder.ToString();
         }
 
-        private void cursorPosition(out int line, out int column)
+        private void cursorPosition(out int line, out int column, out int totalLine)
         {
-            /*  得到光标行第一个字符的索引，
-             *  即从第1个字符开始到光标行的第1个字符索引*/
+            // 以下代码来自互联网
             int index = richCodeBox.GetFirstCharIndexOfCurrentLine();
-            /*得到光标行的行号,第1行从0开始计算，习惯上我们是从1开始计算，所以+1。 */
             line = richCodeBox.GetLineFromCharIndex(index) + 1;
-            /*  SelectionStart得到光标所在位置的索引
-             *  再减去
-             *  当前行第一个字符的索引
-             *  = 光标所在的列数(从0开始)  */
             column = richCodeBox.SelectionStart - index + 1;
-            // MessageBox.Show(string.Format("第：{0}行 {1}列", line.ToString(), column.ToString()));
+            totalLine = this.richCodeBox.GetLineFromCharIndex(this.richCodeBox.TextLength) + 1;
         }
 
 
@@ -79,7 +90,6 @@ namespace EasyPythonIde
         private void buttonOpen_Click(object sender, EventArgs e)
         {
             openFileDialog.ShowDialog();
-            // this.cursorPosition();
         }
 
         private void buttonSave_Click(object sender, EventArgs e)
@@ -92,16 +102,23 @@ namespace EasyPythonIde
         {
             if (CurrentFileChanged)
             {
-                MessageBox.Show("请先保存脚本文件");
-                return;
+                DialogResult result = MessageBox.Show(Resources.SaveBeforeRun,
+                    Resources.SaveBeforeRun_Caption, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                switch (result)
+                {
+                    case DialogResult.Yes:
+                        saveFileDialog.FileName = CurrentFileName;
+                        DialogResult saveResult = saveFileDialog.ShowDialog();
+                        if (saveResult != DialogResult.OK) return;
+                        break;
+                    case DialogResult.No: //实际上也不需要做什么
+                        break;
+                    case DialogResult.Cancel:
+                        return;
+                }
             }
 
-            // MessageBox.Show(richCodeBox.Font.ToString());
-            // richCodeBox.Font=new Font("Consolas",14);
-            // MessageBox.Show(richCodeBox.Font.ToString());
-            string programPath = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
-            Program.Execute(PythonPath + " " + CurrentFilePath);
-            // Program.Execute("echo ass");
+            Program.Execute(PythonPath + " " + CurrentFilePath, Resources.RunCmdPython_Title);
         }
 
         private void openFileDialog_FileOk(object sender, CancelEventArgs e)
@@ -109,7 +126,7 @@ namespace EasyPythonIde
             var pyReader = new StreamReader(openFileDialog.FileName, Encoding.UTF8);
             richCodeBox.Text = pyReader.ReadToEnd();
             pyReader.Close();
-            richCodeBox.Font = new Font("Consolas", 12);
+            richCodeBox.Font = EditorFont;
             CurrentFileChanged = false;
             CurrentFileName = openFileDialog.SafeFileName;
             CurrentFilePath = openFileDialog.FileName;
@@ -135,17 +152,11 @@ namespace EasyPythonIde
                 case Keys.Tab: //Tab
                     key.SuppressKeyPress = true;
                     key.Handled = true;
-                    // MessageBox.Show("按下了tab");
-                    richCodeBox.SelectedText = new StringBuilder().Append(' ',TabSpaceCount).ToString();
-                    // MessageBox.Show(key.IsInputKey.ToString());
-                    // key.
+                    richCodeBox.SelectedText = new StringBuilder().Append(' ', TabSpaceCount).ToString();
                     break;
                 case Keys.Enter: //Enter
                     key.SuppressKeyPress = true;
                     key.Handled = true;
-                    // MessageBox.Show("按下了回车");
-                    // richCodeBox.SelectedText="\n";
-                    // MessageBox.Show();
                     string lastLine = richCodeBox.Text.Substring(richCodeBox.GetFirstCharIndexOfCurrentLine(),
                         richCodeBox.SelectionStart - richCodeBox.GetFirstCharIndexOfCurrentLine());
                     StringBuilder spaceBuilder = new StringBuilder();
@@ -153,7 +164,7 @@ namespace EasyPythonIde
                     spaceBuilder.Append(' ', (lastLine.Length - lastLine.TrimStart().Length));
                     if (lastLine.Trim().EndsWith(":"))
                     {
-                        spaceBuilder.Append(' ',TabSpaceCount);
+                        spaceBuilder.Append(' ', TabSpaceCount);
                     }
 
                     richCodeBox.SelectedText = spaceBuilder.ToString();
@@ -161,6 +172,7 @@ namespace EasyPythonIde
                     break;
                 // case (char)
             }
+
             updateStat();
         }
 

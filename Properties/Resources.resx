@@ -46,7 +46,7 @@
     
     mimetype: application/x-microsoft.net.object.binary.base64
     value   : The object must be serialized with 
-            : System.Serialization.Formatters.Binary.BinaryFormatter
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
     
     mimetype: application/x-microsoft.net.object.soap.base64
@@ -60,6 +60,7 @@
             : and then encoded with base64 encoding.
     -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
@@ -68,9 +69,10 @@
               <xsd:sequence>
                 <xsd:element name="value" type="xsd:string" minOccurs="0" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="name" use="required" type="xsd:string" />
               <xsd:attribute name="type" type="xsd:string" />
               <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
@@ -85,9 +87,10 @@
                 <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
                 <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
               <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
               <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
@@ -109,9 +112,77 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="BundlePyhton_NotFound" xml:space="preserve">
+    <value>未检测到同捆Python解释器，将会尝试使用系统自带版本</value>
+  </data>
+  <data name="BundlePython_Found" xml:space="preserve">
+    <value>已成功检测到目录下同捆Python解释器</value>
+  </data>
+  <data name="BundlePython_MessageCaption" xml:space="preserve">
+    <value>Python解释器检测</value>
+  </data>
+  <data name="Button_Open" xml:space="preserve">
+    <value>打开</value>
+  </data>
+  <data name="Button_Run" xml:space="preserve">
+    <value>运行</value>
+  </data>
+  <data name="Button_Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="CannotExecuteNull" xml:space="preserve">
+    <value>无法执行空命令</value>
+    <comment>Program.Execute中传入的command为null时弹窗提示</comment>
+  </data>
+  <data name="CannotExecuteNull_Caption" xml:space="preserve">
+    <value>出现运行错误</value>
+    <comment>同上</comment>
+  </data>
+  <data name="CaptionJoin_Edited" xml:space="preserve">
+    <value>(已修改) - </value>
+    <comment>在标题上连接文件名与程序名</comment>
+  </data>
+  <data name="CaptionJoin_Unedited" xml:space="preserve">
+    <value> - </value>
+    <comment>在标题上连接文件名与程序名</comment>
+  </data>
+  <data name="DefaultFileName" xml:space="preserve">
+    <value>untitle.py</value>
+    <comment>默认文件名</comment>
+  </data>
+  <data name="ProgramName" xml:space="preserve">
+    <value>EasyPython</value>
+    <comment>标题上显示的程序名</comment>
+  </data>
+  <data name="RunCmdPython_Title" xml:space="preserve">
+    <value>Python脚本运行中...</value>
+  </data>
+  <data name="RunCmd_Title" xml:space="preserve">
+    <value>控制台程序运行中...</value>
+  </data>
+  <data name="SaveBeforeRun" xml:space="preserve">
+    <value>是否要先保存脚本文件再运行？（否则会运行该文件的上一版本）</value>
+    <comment>Main.buttonRun_Click中运行前未保存的提示</comment>
+  </data>
+  <data name="SaveBeforeRun_Caption" xml:space="preserve">
+    <value>脚本文件未保存</value>
+    <comment>同上</comment>
+  </data>
+  <data name="StatisticLabel_pt1" xml:space="preserve">
+    <value>第</value>
+  </data>
+  <data name="StatisticLabel_pt2" xml:space="preserve">
+    <value>行,第</value>
+  </data>
+  <data name="StatisticLabel_pt3" xml:space="preserve">
+    <value>列,共</value>
+  </data>
+  <data name="StatisticLabel_pt4" xml:space="preserve">
+    <value>行</value>
+  </data>
 </root>

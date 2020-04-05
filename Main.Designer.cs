@@ -1,4 +1,6 @@
-﻿namespace EasyPythonIde
+﻿using System.Drawing;
+
+namespace EasyPythonIde
 {
     partial class Main
     {
@@ -28,6 +30,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.buttonOpen = new System.Windows.Forms.Button();
             this.buttonSave = new System.Windows.Forms.Button();
             this.buttonRun = new System.Windows.Forms.Button();
@@ -39,76 +42,57 @@
             // 
             // buttonOpen
             // 
-            this.buttonOpen.Location = new System.Drawing.Point(-1, -1);
+            resources.ApplyResources(this.buttonOpen, "buttonOpen");
             this.buttonOpen.Name = "buttonOpen";
-            this.buttonOpen.Size = new System.Drawing.Size(75, 23);
-            this.buttonOpen.TabIndex = 1;
-            this.buttonOpen.Text = "打开";
             this.buttonOpen.UseVisualStyleBackColor = true;
             this.buttonOpen.Click += new System.EventHandler(this.buttonOpen_Click);
             // 
             // buttonSave
             // 
-            this.buttonSave.Location = new System.Drawing.Point(80, -1);
+            resources.ApplyResources(this.buttonSave, "buttonSave");
             this.buttonSave.Name = "buttonSave";
-            this.buttonSave.Size = new System.Drawing.Size(75, 23);
-            this.buttonSave.TabIndex = 2;
-            this.buttonSave.Text = "保存";
             this.buttonSave.UseVisualStyleBackColor = true;
             this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
             // 
             // buttonRun
             // 
-            this.buttonRun.Location = new System.Drawing.Point(310, -1);
+            resources.ApplyResources(this.buttonRun, "buttonRun");
             this.buttonRun.Name = "buttonRun";
-            this.buttonRun.Size = new System.Drawing.Size(75, 23);
-            this.buttonRun.TabIndex = 3;
-            this.buttonRun.Text = "运行";
             this.buttonRun.UseVisualStyleBackColor = true;
             this.buttonRun.Click += new System.EventHandler(this.buttonRun_Click);
             // 
             // openFileDialog
             // 
             this.openFileDialog.DefaultExt = "py";
-            this.openFileDialog.Filter = "Python 脚本|*.py|所有文件|*.*";
+            resources.ApplyResources(this.openFileDialog, "openFileDialog");
             this.openFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog_FileOk);
             // 
             // saveFileDialog
             // 
             this.saveFileDialog.DefaultExt = "py";
-            this.saveFileDialog.Filter = "Python 脚本|*.py|所有文件|*.*";
+            resources.ApplyResources(this.saveFileDialog, "saveFileDialog");
             this.saveFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog_FileOk);
             // 
             // richCodeBox
             // 
             this.richCodeBox.AcceptsTab = true;
+            resources.ApplyResources(this.richCodeBox, "richCodeBox");
             this.richCodeBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.richCodeBox.BulletIndent = 2;
             this.richCodeBox.EnableAutoDragDrop = true;
-            this.richCodeBox.Font = new System.Drawing.Font("Consolas", 12F);
-            this.richCodeBox.Location = new System.Drawing.Point(-1, 20);
             this.richCodeBox.Name = "richCodeBox";
-            this.richCodeBox.Size = new System.Drawing.Size(386, 381);
-            this.richCodeBox.TabIndex = 4;
-            this.richCodeBox.Text = "";
-            this.richCodeBox.WordWrap = false;
             this.richCodeBox.TextChanged += new System.EventHandler(this.richCodeBox_TextChanged);
             this.richCodeBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.richCodeBox_KeyDown);
             this.richCodeBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.richCodeBox_MouseDown);
             // 
             // labelCount
             // 
-            this.labelCount.AutoSize = true;
-            this.labelCount.Location = new System.Drawing.Point(161, 4);
+            resources.ApplyResources(this.labelCount, "labelCount");
             this.labelCount.Name = "labelCount";
-            this.labelCount.Size = new System.Drawing.Size(0, 12);
-            this.labelCount.TabIndex = 5;
             // 
             // Main
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(384, 401);
             this.Controls.Add(this.labelCount);
             this.Controls.Add(this.richCodeBox);
             this.Controls.Add(this.buttonRun);
@@ -116,8 +100,8 @@
             this.Controls.Add(this.buttonOpen);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.HelpButton = true;
+            this.MaximizeBox = false;
             this.Name = "Main";
-            this.Text = "EasyPython";
             this.Load += new System.EventHandler(this.Main_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

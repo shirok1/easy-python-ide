@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using EasyPythonIde.Properties;
 
 namespace EasyPythonIde
 {
@@ -20,29 +22,33 @@ namespace EasyPythonIde
             Application.Run(new Main());
         }
 
-        internal static void Execute(string command, bool pause=true)
+        internal static void Execute(string command, string title = null, bool pause = true)
         {
             if (command is null)
             {
-                MessageBox.Show("无法执行空命令");
+                MessageBox.Show(Resources.CannotExecuteNull,
+                    Resources.CannotExecuteNull_Caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
+            if (title is null)
+            {
+                title = Resources.RunCmd_Title;
+            }
+
+            //以下代码来自互联网
             var process = new Process();
-            var startInfo = new ProcessStartInfo();
-            // string path = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
-            // startInfo.CurrentFileName=path+"\\python\\python.exe";
-            startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = "/C \""+command+"\""+(pause?"&&pause":"");
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "cmd.exe",
+                Arguments = "/C title " + title + "\"" + command + "\"" + (pause ? "&pause" : "")
+            };
             process.StartInfo = startInfo;
             try
             {
                 if (process.Start()) //开始进程 
                 {
                     process.WaitForExit(); //这里无限等待进程结束 
-
-                    // MessageBox.Show(process.StandardOutput.ReadToEnd());
-                    // output = process.StandardOutput.ReadToEnd(); //读取进程的输出 
                 }
             }
             catch
