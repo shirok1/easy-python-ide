@@ -30,14 +30,19 @@ namespace EasyPythonIde
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.buttonOpen = new System.Windows.Forms.Button();
             this.buttonSave = new System.Windows.Forms.Button();
             this.buttonRun = new System.Windows.Forms.Button();
+            this.menuRunOption = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuRunTempRun = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuRunSettings = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.richCodeBox = new System.Windows.Forms.RichTextBox();
             this.labelCount = new System.Windows.Forms.Label();
+            this.menuRunOption.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonOpen
@@ -56,10 +61,32 @@ namespace EasyPythonIde
             // 
             // buttonRun
             // 
+            this.buttonRun.ContextMenuStrip = this.menuRunOption;
             resources.ApplyResources(this.buttonRun, "buttonRun");
             this.buttonRun.Name = "buttonRun";
             this.buttonRun.UseVisualStyleBackColor = true;
             this.buttonRun.Click += new System.EventHandler(this.buttonRun_Click);
+            // 
+            // menuRunOption
+            // 
+            this.menuRunOption.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuRunTempRun,
+            this.menuRunSettings});
+            this.menuRunOption.Name = "menuRunOption";
+            resources.ApplyResources(this.menuRunOption, "menuRunOption");
+            // 
+            // menuRunTempRun
+            // 
+            this.menuRunTempRun.CheckOnClick = true;
+            this.menuRunTempRun.Name = "menuRunTempRun";
+            resources.ApplyResources(this.menuRunTempRun, "menuRunTempRun");
+            this.menuRunTempRun.CheckedChanged += new System.EventHandler(this.menuRunTempRun_CheckedChanged);
+            // 
+            // menuRunSettings
+            // 
+            this.menuRunSettings.Name = "menuRunSettings";
+            resources.ApplyResources(this.menuRunSettings, "menuRunSettings");
+            this.menuRunSettings.Click += new System.EventHandler(this.Settings_Click);
             // 
             // openFileDialog
             // 
@@ -76,13 +103,14 @@ namespace EasyPythonIde
             // richCodeBox
             // 
             this.richCodeBox.AcceptsTab = true;
-            resources.ApplyResources(this.richCodeBox, "richCodeBox");
             this.richCodeBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            resources.ApplyResources(this.richCodeBox, "richCodeBox");
             this.richCodeBox.EnableAutoDragDrop = true;
             this.richCodeBox.Name = "richCodeBox";
+            this.richCodeBox.Click += new System.EventHandler(this.richCodeBox_Click);
             this.richCodeBox.TextChanged += new System.EventHandler(this.richCodeBox_TextChanged);
             this.richCodeBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.richCodeBox_KeyDown);
-            this.richCodeBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.richCodeBox_MouseDown);
+            this.richCodeBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.richCodeBox_KeyUp);
             // 
             // labelCount
             // 
@@ -102,7 +130,9 @@ namespace EasyPythonIde
             this.HelpButton = true;
             this.MaximizeBox = false;
             this.Name = "Main";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_FormClosing);
             this.Load += new System.EventHandler(this.Main_Load);
+            this.menuRunOption.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -116,6 +146,9 @@ namespace EasyPythonIde
         private System.Windows.Forms.SaveFileDialog saveFileDialog;
         private System.Windows.Forms.RichTextBox richCodeBox;
         private System.Windows.Forms.Label labelCount;
+        private System.Windows.Forms.ContextMenuStrip menuRunOption;
+        private System.Windows.Forms.ToolStripMenuItem menuRunTempRun;
+        private System.Windows.Forms.ToolStripMenuItem menuRunSettings;
     }
 }
 

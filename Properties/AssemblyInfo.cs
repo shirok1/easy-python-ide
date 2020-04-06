@@ -9,9 +9,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("EasyPython")]
 [assembly: AssemblyDescription("世界上最不集成的Python集成开发环境")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("白木重工")]
+[assembly: AssemblyCompany("白木重工株式会社")]
 [assembly: AssemblyProduct("EasyPython Integrated Development Environment")]
-[assembly: AssemblyCopyright("Copyleft 2020")]
+[assembly: AssemblyCopyright("© 2020 白木重工")]
 [assembly: AssemblyTrademark("哪来的商标")]
 [assembly: AssemblyCulture("")]
 
@@ -33,6 +33,6 @@ using System.Runtime.InteropServices;
 //可以指定所有这些值，也可以使用“生成号”和“修订号”的默认值
 //通过使用 "*"，如下所示:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.0.0.1")]
-[assembly: AssemblyFileVersion("0.0.0.1")]
+[assembly: AssemblyVersion("0.0.1.1")]
+[assembly: AssemblyFileVersion("0.0.1.1")]
 [assembly: NeutralResourcesLanguage("zh-CN")]

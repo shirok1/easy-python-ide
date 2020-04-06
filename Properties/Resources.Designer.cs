@@ -61,6 +61,16 @@ namespace EasyPythonIde.Properties {
         }
         
         /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap Avatar150 {
+            get {
+                object obj = ResourceManager.GetObject("Avatar150", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 未检测到同捆Python解释器，将会尝试使用系统自带版本 的本地化字符串。
         /// </summary>
         internal static string BundlePyhton_NotFound {
@@ -142,6 +152,15 @@ namespace EasyPythonIde.Properties {
         }
         
         /// <summary>
+        ///   查找类似 临时文件模式 -  的本地化字符串。
+        /// </summary>
+        internal static string CaptionJoin_TempRun {
+            get {
+                return ResourceManager.GetString("CaptionJoin_TempRun", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似  -  的本地化字符串。
         /// </summary>
         internal static string CaptionJoin_Unedited {
@@ -156,6 +175,51 @@ namespace EasyPythonIde.Properties {
         internal static string DefaultFileName {
             get {
                 return ResourceManager.GetString("DefaultFileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 profile.xml 的本地化字符串。
+        /// </summary>
+        internal static string ProfilePath {
+            get {
+                return ResourceManager.GetString("ProfilePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 配置文件已损坏,是否删除? 的本地化字符串。
+        /// </summary>
+        internal static string ProfileReadError {
+            get {
+                return ResourceManager.GetString("ProfileReadError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 配置文件读取错误 的本地化字符串。
+        /// </summary>
+        internal static string ProfileReadError_Caption {
+            get {
+                return ResourceManager.GetString("ProfileReadError_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 配置文件写入错误,请尝试手动删除程序目录下的 的本地化字符串。
+        /// </summary>
+        internal static string ProfileWriteError {
+            get {
+                return ResourceManager.GetString("ProfileWriteError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 配置文件写入错误 的本地化字符串。
+        /// </summary>
+        internal static string ProfileWriteError_Caption {
+            get {
+                return ResourceManager.GetString("ProfileWriteError_Caption", resourceCulture);
             }
         }
         
@@ -187,7 +251,25 @@ namespace EasyPythonIde.Properties {
         }
         
         /// <summary>
-        ///   查找类似 是否要先保存脚本文件再运行？（否则会运行该文件的上一版本） 的本地化字符串。
+        ///   查找类似 是否要先保存脚本文件再退出?(否则将会失去该文件的最新版本) 的本地化字符串。
+        /// </summary>
+        internal static string SaveBeforeExit {
+            get {
+                return ResourceManager.GetString("SaveBeforeExit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 脚本文件未保存 的本地化字符串。
+        /// </summary>
+        internal static string SaveBeforeExit_Caption {
+            get {
+                return ResourceManager.GetString("SaveBeforeExit_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 是否要先保存脚本文件再运行?(否则会运行该文件的上一版本) 的本地化字符串。
         /// </summary>
         internal static string SaveBeforeRun {
             get {
@@ -237,6 +319,33 @@ namespace EasyPythonIde.Properties {
         internal static string StatisticLabel_pt4 {
             get {
                 return ResourceManager.GetString("StatisticLabel_pt4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 使用临时文件模式可以更加方便的进行调试,但是有可能会造成数据丢失,是否仍要开启此开关? 的本地化字符串。
+        /// </summary>
+        internal static string TempRunConfirm {
+            get {
+                return ResourceManager.GetString("TempRunConfirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 不应在实用环境中使用临时文件模式运行 的本地化字符串。
+        /// </summary>
+        internal static string TempRunConfirm_Caption {
+            get {
+                return ResourceManager.GetString("TempRunConfirm_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 https://github.com/shirok1/easy-python-ide 的本地化字符串。
+        /// </summary>
+        internal static string UrlGithubRepo {
+            get {
+                return ResourceManager.GetString("UrlGithubRepo", resourceCulture);
             }
         }
     }

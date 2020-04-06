@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,10 +16,6 @@ namespace EasyPythonIde
         public bool CurrentFileChanged = true;
         public string CurrentFileName = Resources.DefaultFileName;
         public string CurrentFilePath = Resources.DefaultFileName;
-        public string programPath = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
-        public string PythonPath = "";
-        public int TabSpaceCount = 2;
-        public Font EditorFont = new Font("Consolas", 12f);
 
         public Main()
         {
@@ -29,21 +24,12 @@ namespace EasyPythonIde
 
         private void Main_Load(object sender, EventArgs e)
         {
-            string tmpPyPath = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "\\python\\python.exe";
-            if (File.Exists(tmpPyPath))
-            {
-                MessageBox.Show(Resources.BundlePython_Found,
-                    Resources.BundlePython_MessageCaption, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                PythonPath = tmpPyPath;
-            }
-            else
-            {
-                MessageBox.Show(Resources.BundlePyhton_NotFound,
-                    Resources.BundlePython_MessageCaption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                PythonPath = "python.exe";
-            }
-
-            richCodeBox.Font = EditorFont;
+            richCodeBox.Font = Program.Profile.EditorFont;
+            updateCaption();
+            updateMenuRunTempRun();
+            Program.Profile.ChangeCaption += this.updateCaption;
+            Program.Profile.ChangeFont += this.updateFont;//注册字体更新事件
+            Program.Profile.ChangeTempRun += this.updateMenuRunTempRun;//注册菜单上的“临时运行”的更新事件
         }
 
         private void updateCaption()
@@ -51,21 +37,32 @@ namespace EasyPythonIde
             this.Text = CurrentFileName +
                         (CurrentFileChanged ? Resources.CaptionJoin_Edited : Resources.CaptionJoin_Unedited) +
                         Resources.ProgramName;
+            if (Program.Profile.TempRun)
+            {
+                this.Text = Resources.CaptionJoin_TempRun + Resources.ProgramName;
+            }
         }
-        
-        StringBuilder _stat_labelBuilder = new StringBuilder();
-        int _stat_line, _stat_column, _stat_totalLine;
+
+        StringBuilder _statLabelBuilder = new StringBuilder();
+        int _statLine, _statColumn, _statTotalLine;
+
         private void updateStat()
         {
-            cursorPosition(out _stat_line, out _stat_column, out _stat_totalLine);
-            _stat_labelBuilder.Append(Resources.StatisticLabel_pt1);
-            _stat_labelBuilder.Append(_stat_line);
-            _stat_labelBuilder.Append(Resources.StatisticLabel_pt2);
-            _stat_labelBuilder.Append(_stat_column);
-            _stat_labelBuilder.Append(Resources.StatisticLabel_pt3);
-            _stat_labelBuilder.Append(_stat_totalLine);
-            _stat_labelBuilder.Append(Resources.StatisticLabel_pt4);
-            labelCount.Text = _stat_labelBuilder.ToString();
+            cursorPosition(out _statLine, out _statColumn, out _statTotalLine);
+            _statLabelBuilder.Append(Resources.StatisticLabel_pt1);
+            _statLabelBuilder.Append(_statLine);
+            _statLabelBuilder.Append(Resources.StatisticLabel_pt2);
+            _statLabelBuilder.Append(_statColumn);
+            _statLabelBuilder.Append(Resources.StatisticLabel_pt3);
+            _statLabelBuilder.Append(_statTotalLine);
+            _statLabelBuilder.Append(Resources.StatisticLabel_pt4);
+            labelCount.Text = _statLabelBuilder.ToString();
+            _statLabelBuilder.Clear();
+        }
+
+        private void updateFont()
+        {
+            richCodeBox.Font = Program.Profile.EditorFont;
         }
 
         private void cursorPosition(out int line, out int column, out int totalLine)
@@ -100,7 +97,16 @@ namespace EasyPythonIde
 
         private void buttonRun_Click(object sender, EventArgs e)
         {
-            if (CurrentFileChanged)
+            if (Program.Profile.TempRun)//开启了不保存运行的功能
+            {
+                string tempFilePath = System.IO.Path.GetTempFileName();
+                var pyWriter = new System.IO.StreamWriter(tempFilePath, false);
+                pyWriter.Write(richCodeBox.Text);
+                pyWriter.Close();
+                Program.Execute("\""+Program.Profile.PythonPath+"\"", "\""+tempFilePath+"\"", Resources.RunCmdPython_Title);
+                return;
+            }
+            if (CurrentFileChanged)//当前文件未保存
             {
                 DialogResult result = MessageBox.Show(Resources.SaveBeforeRun,
                     Resources.SaveBeforeRun_Caption, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
@@ -117,16 +123,16 @@ namespace EasyPythonIde
                         return;
                 }
             }
-
-            Program.Execute(PythonPath + " " + CurrentFilePath, Resources.RunCmdPython_Title);
+            // MessageBox.Show(Program.Profile.PythonPath);
+            Program.Execute("\""+Program.Profile.PythonPath+"\"", "\""+CurrentFilePath+"\"", Resources.RunCmdPython_Title);
         }
 
         private void openFileDialog_FileOk(object sender, CancelEventArgs e)
         {
-            var pyReader = new StreamReader(openFileDialog.FileName, Encoding.UTF8);
+            var pyReader = new System.IO.StreamReader(openFileDialog.FileName, Encoding.UTF8);
             richCodeBox.Text = pyReader.ReadToEnd();
             pyReader.Close();
-            richCodeBox.Font = EditorFont;
+            richCodeBox.Font = Program.Profile.EditorFont;
             CurrentFileChanged = false;
             CurrentFileName = openFileDialog.SafeFileName;
             CurrentFilePath = openFileDialog.FileName;
@@ -135,7 +141,7 @@ namespace EasyPythonIde
 
         private void saveFileDialog_FileOk(object sender, CancelEventArgs e)
         {
-            var pyWriter = new StreamWriter(saveFileDialog.FileName, false);
+            var pyWriter = new System.IO.StreamWriter(saveFileDialog.FileName, false);
             pyWriter.Write(richCodeBox.Text);
             pyWriter.Close();
             CurrentFileChanged = false;
@@ -144,15 +150,67 @@ namespace EasyPythonIde
             updateCaption();
         }
 
+        private void Main_FormClosing(object sender, FormClosingEventArgs closingEvent)
+        {
+            if (CurrentFileChanged)
+            {
+                DialogResult result = MessageBox.Show(Resources.SaveBeforeExit,
+                    Resources.SaveBeforeExit_Caption, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                switch (result)
+                {
+                    case DialogResult.Yes:
+                        saveFileDialog.FileName = CurrentFileName;
+                        DialogResult saveResult = saveFileDialog.ShowDialog();
+                        if (saveResult != DialogResult.OK)
+                        {
+                            closingEvent.Cancel = true;
+                            return;
+                        }
 
-        private void richCodeBox_KeyDown(object sender, KeyEventArgs key)
+                        break;
+                    case DialogResult.No:
+                        break;
+                    case DialogResult.Cancel:
+                        closingEvent.Cancel = true;
+                        return;
+                }
+            }
+        }
+
+        private void Settings_Click(object sender, EventArgs e)
+        {
+            new Settings().Show();
+        }
+
+        private void richCodeBox_Click(object sender, EventArgs e)
+        {
+            updateStat();
+        }
+
+        private void menuRunTempRun_CheckedChanged(object sender, EventArgs e)
+        {
+            Program.Profile.TempRun = menuRunTempRun.Checked;
+        }
+
+        private void updateMenuRunTempRun()
+        {
+            menuRunTempRun.Checked = Program.Profile.TempRun;
+        }
+
+        private void richCodeBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            updateStat();
+        }
+
+        private void richCodeBox_KeyDown(object sender, KeyEventArgs key)//处理各种按键逻辑
         {
             switch (key.KeyCode)
             {
                 case Keys.Tab: //Tab
                     key.SuppressKeyPress = true;
                     key.Handled = true;
-                    richCodeBox.SelectedText = new StringBuilder().Append(' ', TabSpaceCount).ToString();
+                    richCodeBox.SelectedText =
+                        new StringBuilder().Append(' ', Program.Profile.TabSpaceCount).ToString();
                     break;
                 case Keys.Enter: //Enter
                     key.SuppressKeyPress = true;
@@ -164,21 +222,12 @@ namespace EasyPythonIde
                     spaceBuilder.Append(' ', (lastLine.Length - lastLine.TrimStart().Length));
                     if (lastLine.Trim().EndsWith(":"))
                     {
-                        spaceBuilder.Append(' ', TabSpaceCount);
+                        spaceBuilder.Append(' ', Program.Profile.TabSpaceCount);
                     }
 
                     richCodeBox.SelectedText = spaceBuilder.ToString();
-                    // richCodeBox.SelectedText+="\n";
                     break;
-                // case (char)
             }
-
-            updateStat();
-        }
-
-        private void richCodeBox_MouseDown(object sender, MouseEventArgs e)
-        {
-            updateStat();
         }
     }
 }
