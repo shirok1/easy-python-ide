@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
 using EasyPythonIde.Properties;
 
@@ -22,7 +17,7 @@ namespace EasyPythonIde
         private void Settings_Load(object sender, EventArgs e)
         {
             numericUpDownSettingsEditorTabWidth.Value = Program.Profile.TabSpaceCount;
-            if (!System.IO.File.Exists(Program.Profile.BundlePythonPath)) radioButtonSettingsInterpreterBundled.Enabled = false;
+            if (!File.Exists(Program.Profile.BundlePythonPath)) radioButtonSettingsInterpreterBundled.Enabled = false;
             switch (Program.Profile.InterpreterType)
             {
                 case Program.Profile.PythonInterpreterType.Bundled:
@@ -35,7 +30,7 @@ namespace EasyPythonIde
                     radioButtonSettingsInterpreterCustomized.Checked = true;
                     break;
             }
-
+            //我不知道还能怎么写……
             textBoxSettingsInterpreterCustomPath.Text = Program.Profile.PythonPath;
             textBoxSettingsInterpreterCustomPath.Enabled = radioButtonSettingsInterpreterCustomized.Checked;
             buttonSettingsInterpreterBrowser.Enabled = radioButtonSettingsInterpreterCustomized.Checked;
@@ -43,22 +38,19 @@ namespace EasyPythonIde
 
         private void numericUpDownSettingsEditorTabWidth_ValueChanged(object sender, EventArgs e)
         {
-            Program.Profile.TabSpaceCount = (short) numericUpDownSettingsEditorTabWidth.Value;
+            Program.Profile.TabSpaceCount = (short) numericUpDownSettingsEditorTabWidth.Value;//实时更新配置
         }
 
         private void linkLabelGithubRepo_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            this.linkLabelSettingsAboutGithubRepo.Links[0].LinkData = Resources.UrlGithubRepo;
-            System.Diagnostics.Process.Start(e.Link.LinkData.ToString());
+            linkLabelSettingsAboutGithubRepo.Links[0].LinkData = Resources.UrlGithubRepo;
+            Process.Start(e.Link.LinkData.ToString());//打开本项目的Github仓库
         }
 
         private void buttonSettingsEditorFont_Click(object sender, EventArgs e)
         {
-            fontDialogEditor.Font = (Font) Program.Profile.EditorFont;
-            if (fontDialogEditor.ShowDialog() == DialogResult.OK)
-            {
-                Program.Profile.EditorFont = fontDialogEditor.Font;
-            }
+            fontDialogEditor.Font = Program.Profile.EditorFont;//将当前字体设置设为字体设置窗体的默认
+            if (fontDialogEditor.ShowDialog() == DialogResult.OK) Program.Profile.EditorFont = fontDialogEditor.Font;
         }
 
         private void buttonSettingsInterpreterBrowser_Click(object sender, EventArgs e)
@@ -68,55 +60,46 @@ namespace EasyPythonIde
             {
                 Program.Profile.CustomPythonPath = openPythonInterpreterBrowser.FileName;
                 textBoxSettingsInterpreterCustomPath.Text = openPythonInterpreterBrowser.FileName;
-            }
+            }//更新当前配置与路径框
         }
 
         private void radioButtonSettingsInterpreterBundled_CheckedChanged(object sender, EventArgs e)
         {
             if (radioButtonSettingsInterpreterBundled.Enabled)
-            {
-                Program.Profile.InterpreterType=Program.Profile.PythonInterpreterType.Bundled;
-            }
+                Program.Profile.InterpreterType = Program.Profile.PythonInterpreterType.Bundled;
         }
 
         private void radioButtonSettingsInterpreterSystem_CheckedChanged(object sender, EventArgs e)
         {
             if (radioButtonSettingsInterpreterSystem.Enabled)
-            {
-                Program.Profile.InterpreterType=Program.Profile.PythonInterpreterType.System;
-            }
+                Program.Profile.InterpreterType = Program.Profile.PythonInterpreterType.System;
         }
 
         private void radioButtonSettingsInterpreterCustomized_CheckedChanged(object sender, EventArgs e)
         {
             if (radioButtonSettingsInterpreterCustomized.Enabled)
-            {
-                Program.Profile.InterpreterType=Program.Profile.PythonInterpreterType.Customized;
-            }
+                Program.Profile.InterpreterType = Program.Profile.PythonInterpreterType.Customized;
+            //下面同步更新解释器路径框与浏览器的启用禁用状态
             textBoxSettingsInterpreterCustomPath.Enabled = radioButtonSettingsInterpreterCustomized.Checked;
             buttonSettingsInterpreterBrowser.Enabled = radioButtonSettingsInterpreterCustomized.Checked;
         }
 
         private void buttonSettingsCleanProfile_Click(object sender, EventArgs e)
         {
-            if (System.IO.File.Exists(Resources.ProfilePath))
-            {
-                System.IO.File.Delete(Resources.ProfilePath);
-            }else
-            {
+            if (File.Exists(Resources.ProfilePath))
+                File.Delete(Resources.ProfilePath);
+            else//暂时硬编码,这是一个未来可能被删掉的功能
                 buttonSettingsCleanProfile.Text = "配置文件不存在……";
-            }
         }
 
         private void buttonSettingsSavingEditor_Click(object sender, EventArgs e)
         {
-            Program.Profile.ProfileWrite();
+            Program.Profile.ProfileWrite();//写入配置文件
         }
 
         private void buttonSettingsSavingInterpreter_Click(object sender, EventArgs e)
         {
-                        Program.Profile.ProfileWrite();
-
+            Program.Profile.ProfileWrite();//写入配置文件
         }
     }
 }

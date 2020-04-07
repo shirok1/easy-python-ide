@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
+using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using EasyPythonIde.Properties;
 
@@ -13,9 +9,11 @@ namespace EasyPythonIde
 {
     public partial class Main : Form
     {
-        public bool CurrentFileChanged = true;
-        public string CurrentFileName = Resources.DefaultFileName;
-        public string CurrentFilePath = Resources.DefaultFileName;
+        private readonly StringBuilder _statLabelBuilder = new StringBuilder();//仅供行数统计使用
+        private int _statLine, _statColumn, _statTotalLine;//仅供行数统计使用
+        public bool CurrentFileChanged = true;//当前文件是否已被更改
+        public string CurrentFileName = Resources.DefaultFileName;//当前操作的文件的名称
+        public string CurrentFilePath = Resources.DefaultFileName;//当前操作的文件的路径
 
         public Main()
         {
@@ -27,24 +25,18 @@ namespace EasyPythonIde
             richCodeBox.Font = Program.Profile.EditorFont;
             updateCaption();
             updateMenuRunTempRun();
-            Program.Profile.ChangeCaption += this.updateCaption;
-            Program.Profile.ChangeFont += this.updateFont;//注册字体更新事件
-            Program.Profile.ChangeTempRun += this.updateMenuRunTempRun;//注册菜单上的“临时运行”的更新事件
+            Program.Profile.ChangeCaption += updateCaption;
+            Program.Profile.ChangeFont += updateFont; //注册字体更新事件
+            Program.Profile.ChangeTempRun += updateMenuRunTempRun; //注册菜单上的“临时运行”的更新事件
         }
 
         private void updateCaption()
         {
-            this.Text = CurrentFileName +
-                        (CurrentFileChanged ? Resources.CaptionJoin_Edited : Resources.CaptionJoin_Unedited) +
-                        Resources.ProgramName;
-            if (Program.Profile.TempRun)
-            {
-                this.Text = Resources.CaptionJoin_TempRun + Resources.ProgramName;
-            }
+            Text = CurrentFileName +
+                   (CurrentFileChanged ? Resources.CaptionJoin_Edited : Resources.CaptionJoin_Unedited) +
+                   Resources.ProgramName;
+            if (Program.Profile.TempRun) Text = Resources.CaptionJoin_TempRun + Resources.ProgramName;
         }
-
-        StringBuilder _statLabelBuilder = new StringBuilder();
-        int _statLine, _statColumn, _statTotalLine;
 
         private void updateStat()
         {
@@ -68,10 +60,10 @@ namespace EasyPythonIde
         private void cursorPosition(out int line, out int column, out int totalLine)
         {
             // 以下代码来自互联网
-            int index = richCodeBox.GetFirstCharIndexOfCurrentLine();
+            var index = richCodeBox.GetFirstCharIndexOfCurrentLine();
             line = richCodeBox.GetLineFromCharIndex(index) + 1;
             column = richCodeBox.SelectionStart - index + 1;
-            totalLine = this.richCodeBox.GetLineFromCharIndex(this.richCodeBox.TextLength) + 1;
+            totalLine = richCodeBox.GetLineFromCharIndex(richCodeBox.TextLength) + 1;
         }
 
 
@@ -97,24 +89,26 @@ namespace EasyPythonIde
 
         private void buttonRun_Click(object sender, EventArgs e)
         {
-            if (Program.Profile.TempRun)//开启了不保存运行的功能
+            if (Program.Profile.TempRun) //开启了不保存运行的功能
             {
-                string tempFilePath = System.IO.Path.GetTempFileName();
-                var pyWriter = new System.IO.StreamWriter(tempFilePath, false);
+                var tempFilePath = Path.GetTempFileName();
+                var pyWriter = new StreamWriter(tempFilePath, false);
                 pyWriter.Write(richCodeBox.Text);
                 pyWriter.Close();
-                Program.Execute("\""+Program.Profile.PythonPath+"\"", "\""+tempFilePath+"\"", Resources.RunCmdPython_Title);
+                Program.Execute("\"" + Program.Profile.PythonPath + "\"", "\"" + tempFilePath + "\"",
+                    Resources.RunCmdPython_Title);
                 return;
             }
-            if (CurrentFileChanged)//当前文件未保存
+
+            if (CurrentFileChanged) //当前文件未保存
             {
-                DialogResult result = MessageBox.Show(Resources.SaveBeforeRun,
+                var result = MessageBox.Show(Resources.SaveBeforeRun,
                     Resources.SaveBeforeRun_Caption, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
                 switch (result)
                 {
                     case DialogResult.Yes:
                         saveFileDialog.FileName = CurrentFileName;
-                        DialogResult saveResult = saveFileDialog.ShowDialog();
+                        var saveResult = saveFileDialog.ShowDialog();
                         if (saveResult != DialogResult.OK) return;
                         break;
                     case DialogResult.No: //实际上也不需要做什么
@@ -123,13 +117,15 @@ namespace EasyPythonIde
                         return;
                 }
             }
+
             // MessageBox.Show(Program.Profile.PythonPath);
-            Program.Execute("\""+Program.Profile.PythonPath+"\"", "\""+CurrentFilePath+"\"", Resources.RunCmdPython_Title);
+            Program.Execute("\"" + Program.Profile.PythonPath + "\"", "\"" + CurrentFilePath + "\"",
+                Resources.RunCmdPython_Title);
         }
 
         private void openFileDialog_FileOk(object sender, CancelEventArgs e)
         {
-            var pyReader = new System.IO.StreamReader(openFileDialog.FileName, Encoding.UTF8);
+            var pyReader = new StreamReader(openFileDialog.FileName, Encoding.UTF8);
             richCodeBox.Text = pyReader.ReadToEnd();
             pyReader.Close();
             richCodeBox.Font = Program.Profile.EditorFont;
@@ -141,7 +137,7 @@ namespace EasyPythonIde
 
         private void saveFileDialog_FileOk(object sender, CancelEventArgs e)
         {
-            var pyWriter = new System.IO.StreamWriter(saveFileDialog.FileName, false);
+            var pyWriter = new StreamWriter(saveFileDialog.FileName, false);
             pyWriter.Write(richCodeBox.Text);
             pyWriter.Close();
             CurrentFileChanged = false;
@@ -154,18 +150,14 @@ namespace EasyPythonIde
         {
             if (CurrentFileChanged)
             {
-                DialogResult result = MessageBox.Show(Resources.SaveBeforeExit,
+                var result = MessageBox.Show(Resources.SaveBeforeExit,
                     Resources.SaveBeforeExit_Caption, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
                 switch (result)
                 {
                     case DialogResult.Yes:
                         saveFileDialog.FileName = CurrentFileName;
-                        DialogResult saveResult = saveFileDialog.ShowDialog();
-                        if (saveResult != DialogResult.OK)
-                        {
-                            closingEvent.Cancel = true;
-                            return;
-                        }
+                        var saveResult = saveFileDialog.ShowDialog();
+                        if (saveResult != DialogResult.OK) closingEvent.Cancel = true;
 
                         break;
                     case DialogResult.No:
@@ -202,7 +194,7 @@ namespace EasyPythonIde
             updateStat();
         }
 
-        private void richCodeBox_KeyDown(object sender, KeyEventArgs key)//处理各种按键逻辑
+        private void richCodeBox_KeyDown(object sender, KeyEventArgs key) //处理各种按键逻辑
         {
             switch (key.KeyCode)
             {
@@ -215,15 +207,12 @@ namespace EasyPythonIde
                 case Keys.Enter: //Enter
                     key.SuppressKeyPress = true;
                     key.Handled = true;
-                    string lastLine = richCodeBox.Text.Substring(richCodeBox.GetFirstCharIndexOfCurrentLine(),
+                    var lastLine = richCodeBox.Text.Substring(richCodeBox.GetFirstCharIndexOfCurrentLine(),
                         richCodeBox.SelectionStart - richCodeBox.GetFirstCharIndexOfCurrentLine());
-                    StringBuilder spaceBuilder = new StringBuilder();
+                    var spaceBuilder = new StringBuilder();
                     spaceBuilder.Append('\n');
-                    spaceBuilder.Append(' ', (lastLine.Length - lastLine.TrimStart().Length));
-                    if (lastLine.Trim().EndsWith(":"))
-                    {
-                        spaceBuilder.Append(' ', Program.Profile.TabSpaceCount);
-                    }
+                    spaceBuilder.Append(' ', lastLine.Length - lastLine.TrimStart().Length);
+                    if (lastLine.Trim().EndsWith(":")) spaceBuilder.Append(' ', Program.Profile.TabSpaceCount);
 
                     richCodeBox.SelectedText = spaceBuilder.ToString();
                     break;

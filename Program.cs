@@ -56,7 +56,7 @@ namespace EasyPythonIde
             }
         }
 
-        internal static class Profile
+        internal static class Profile//整个程序的即时配置,因为不知道怎么强制让窗体中的参数引用这里的,所以需要用事件触发更新
         {
             public delegate void EditorUpdateHandler();
 
@@ -73,8 +73,8 @@ namespace EasyPythonIde
             public static readonly string BundlePythonPath = PythonPath + "python\\python.exe";
             public static string CustomPythonPath = "";
             public static short TabSpaceCount = 2;
-            private static Font _editorFont = new Font("Consolas", 12f);
-            private static bool _tempRun;
+            private static Font _editorFont = new Font("Consolas", 12f);//不直接对外暴露
+            private static bool _tempRun = false;//不直接对外暴露
 
             public static string PythonPath
             {
@@ -130,7 +130,7 @@ namespace EasyPythonIde
                 set
                 {
                     _editorFont = value;
-                    ChangeFont?.Invoke();
+                    ChangeFont?.Invoke();//触发刷新字体事件
                 }
             }
 
@@ -138,7 +138,7 @@ namespace EasyPythonIde
 
             public static event EditorUpdateHandler ChangeTempRun;
 
-            internal static void DetectPythonInterpreter()
+            internal static void DetectPythonInterpreter()//目前这个只会在无配置文件时运行
             {
                 if (File.Exists(BundlePythonPath))
                 {
@@ -173,6 +173,7 @@ namespace EasyPythonIde
                         InterpreterType = (PythonInterpreterType) tmpData.InterpreterType;
                         TabSpaceCount = tmpData.TabSpaceCount;
                         TempRun = tmpData.TempRun;
+                        xmlReader.Close();
                     }
                     catch (InvalidOperationException e)
                     {
@@ -185,20 +186,17 @@ namespace EasyPythonIde
                                 File.Delete(Resources.ProfilePath);
                                 break;
                             case DialogResult.No:
+                                xmlReader.Close();
                                 Environment.Exit(0);
                                 return;
                         }
 
                         DetectPythonInterpreter();
                     }
-                    finally
-                    {
-                        xmlReader.Close();
-                    }
                 }
                 else
                 {
-                    DetectPythonInterpreter();
+                    DetectPythonInterpreter();//直接检测
                 }
             }
 
@@ -218,7 +216,7 @@ namespace EasyPythonIde
                         InterpreterType = (int) InterpreterType,
                         TabSpaceCount = TabSpaceCount,
                         TempRun = TempRun
-                    });
+                    });xmlWriter.Close();
                 }
                 catch (InvalidOperationException e)
                 {
@@ -226,10 +224,6 @@ namespace EasyPythonIde
                     MessageBox.Show(Resources.ProfileWriteError, Resources.ProfileWriteError_Caption +
                                                                  Resources.ProfilePath, MessageBoxButtons.OK,
                         MessageBoxIcon.Error);
-                }
-                finally
-                {
-                    xmlWriter.Close();
                 }
             }
         }
